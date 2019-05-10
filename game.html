@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
+  <style>
+  body{margin:0;padding:0;overflow:hidden;transition: all 1s;    background: url(background4.png);
+    background-position: center;
+    background-size: 140%;
+    background-repeat: no-repeat;}
+  #draggable { left:250px;width: 50px;background:#1e1e1e;color:#EBEBEB; height: 50px; padding: 0.5em; position:absolute;bottom:0px; }
+  #kursun{
+	  
+	  height:30px;
+	  width:5px;
+	  
+	  position:absolute;
+	
+	  
+  }
+  #engeller
+  {
+	  width:calc(100%/4);
+	  height:50px;
+	  background:#000;
+	  position:absolute;
+	  color:#FFF;
+	  
+  }
+  
+  .skor_alani
+  {
+	  
+	  position:absolute;
+	  color:darkblue;
+	  right:0;
+	  top:15;
+	  font-size:35px;
+	  
+  }
+  </style>
+  <script src="jquery-1.12.4.js"></script>
+  <script src="jquery-ui.js"></script>
+ 
+  <script>
+  
+  $( function() {
+    $( "#draggable" ).draggable({
+  containment: "#arena"
+},{ axis: 'x' });
+  } );
+  </script>
+</head>
+<body>
+<script src="socket.io.js"></script>
+  <div class="skor_alani">Skor : <i id="skor">0</i></div>
+  
+  
+ <div id="arena" style="width: 100vw;
+    height: 100vh !important;
+    border: 1px solid black;
+    position: absolute;
+	"></div>
+	
+	
+	
+	
+	
+	
+<div id="draggable" class="ui-widget-content">
+  <p>ME</p>
+</div></div>
+ 
+ <script src="mobile.js"></script>
+ 
+ <script>
+ 
+ var ip = "192.168.1.38";
+			var port = "3000";
+		
+			   var socket = io.connect("http://" + ip + ":" + port);
+			
+		
+		 socket.on("tvac_client", function(data){ //Server.js deki socket.emitten mesaj'ı client'imize socket.on(mesajgitti) ile aldık.
+               var kanalname = get_name(data);
+			  suan_kanal = kanalname;
+			  
+			   
+            });
+           
+			
+			
+
+ 
+ 
+ 
+ 
+ var skor = 0;
+ var olustur = 0;
+ setInterval(function(){ 
+ olustur +=1;
+var p = $( "#draggable" );
+var position = p.position();
+
+var toplam = position.left + 25;
+
+
+ socket.emit("player_moves",position.left);
+
+$( "div#kursun" ).each(function() {
+	var yeni = $(this);
+
+$( "div#engeller" ).each(function() {
+	
+	
+	if(collision(yeni,$(this))){ // Kurşunla Engel Çarpıştığı Andaki İşlemler.
+		yeni.remove();
+	
+	skor +=1;
+	$("#skor").text(skor);
+	$(this).text($(this).text()- 1);
+	
+	
+	if($(this).text() <= 0)  // Engellerin İçindeki Değer 0 dan küçükse Sil Engeli.
+	{
+		$(this).remove();
+		
+	}
+	
+	}
+	
+});
+
+if(parseInt($(this).css("bottom"))  > 500) // Kurşunlar Yukardaysa Sil
+{
+	
+	$( this ).remove();
+}
+else
+{
+	$( this ).css("bottom",parseInt($(this).css("bottom")) + 30 + "px");
+}
+  
+});
+
+
+
+
+
+
+
+  var back = ["#4161f4","#41f4d3","#42f45f","#ac41f4","#f441dc","#f4416d","#f44141"];
+  var rand = back[Math.floor(Math.random() * back.length)];
+ 
+
+if(olustur % 2 == 0)
+$('#arena').append('<div id="kursun" style="  bottom:70px;left:' + toplam + 'px !important;background:'+ rand+ '"></div>');  
+
+
+ 
+ 
+
+ 
+ 
+ 
+ //Engel Oluştur
+ 
+ 
+ 
+   var back3 = ["25%","50%","75%","0%"];
+  var rand3 = back3[Math.floor(Math.random() * back3.length)];
+  
+  
+  //Random Engel Değeri
+  
+  var min = 10;
+var max = 60;
+// and the formula is:
+var random_deger = Math.floor(Math.random() * (max - min + 1)) + min;
+  
+  //
+  
+
+  if(olustur % 20 == 0)
+  $('#arena').append('<div id="engeller" style="  top:5px;left:' + rand3 + ' !important;">'+random_deger +'</div>');
+  
+ $( "div#engeller" ).each(function() {
+
+
+if(parseInt($(this).css("top"))  > 600) // Engeller Aşağıdaysa Sil
+{
+	
+	$( this ).remove();
+}
+else
+{
+	$( this ).css("top",parseInt($(this).css("top")) + 6 + "px");
+}
+  
+  
+//if(collision($(this),$("#draggable"))){location.href = "bitti.php?skor="+$("#skor").text();}
+  
+});
+ 
+ 
+
+ 
+ 
+
+
+ 
+ 
+ }, 50);
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+function collision($div1, $div2) {
+        var x1 = $div1.offset().left;
+        var y1 = $div1.offset().top;
+        var h1 = $div1.outerHeight(true);
+        var w1 = $div1.outerWidth(true);
+        var b1 = y1 + h1;
+        var r1 = x1 + w1;
+        var x2 = $div2.offset().left;
+        var y2 = $div2.offset().top;
+        var h2 = $div2.outerHeight(true);
+        var w2 = $div2.outerWidth(true);
+        var b2 = y2 + h2;
+        var r2 = x2 + w2;
+
+        if (b1 < y2 || y1 > b2 || r1 < x2 || x1 > r2) return false;
+        return true;
+      }
+ </script>
+ 
+ 
+</body>
+</html>

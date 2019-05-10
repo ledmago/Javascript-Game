@@ -1,0 +1,96 @@
+<!doctype HTML5>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
+<style>
+body{
+background:url('game_background.jpg');
+background-size:auto 100%;
+margin-top:30px;
+background-position:center;}
+.buttons{
+width:70%;
+display:block;
+margin: 0 auto;
+}
+input{
+
+width:68%;
+height:45px;
+margin-top:20px;
+margin:0 auto;
+display:block;
+padding:5px;
+border-radius:5px;
+
+}
+#giris{
+
+height:326px;
+position:absolute;
+width:100%;
+top:30%;
+}
+</style>
+</head>
+<body>
+<div id="giris">
+<script src="socket.io.js"></script>
+<script src="jquery-1.12.4.js"></script>
+  <script src="jquery-ui.js"></script>
+  <input type="text" id="username" placeholder="Kullanıcı Adı"><br>
+<input type="password" id="password" placeholder="Şifre"><br><br>
+<img class="buttons" id="giris_buton" src="buton_girisyap.png"><br><br>
+<img class="buttons" src="buton_kayit.png">
+</div>
+<script>
+// Giriş Kontrolleri
+
+  var gelen_id = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 5; i++)
+    gelen_id += possible.charAt(Math.floor(Math.random() * possible.length));
+
+
+
+
+	 var ip = "192.168.1.38";
+			var port = "3000";
+		
+			   var socket = io.connect("http://" + ip + ":" + port);
+			
+			
+			
+			$( "#giris_buton" ).click(function() {
+		var username = $("#username").val();
+		var password = $("#password").val();
+		socket.emit("giris_kontrol2",username,password,gelen_id);
+});
+			
+		
+		 socket.on("giris_yap_"+gelen_id, function(data){ //Server.js deki socket.emitten mesaj'ı client'imize socket.on(mesajgitti) ile aldık.
+               if (data=="nope")
+			   {
+				location.href="hatagiris.html";
+			   }
+			   else
+			   {
+			   localStorage.setItem('myGameUserName', data);
+			   localStorage.setItem('input_username', $("#username").val());
+			   window.location = "launcher.html";
+			   }
+			  
+			   
+            });
+
+
+//////////////////////////////////////
+
+
+</script>
+
+</body>
+
+
+</html>
